@@ -1,0 +1,146 @@
+<html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda de Pacientes</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #3498db;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        #agenda {
+            width: 400px;
+            padding: 20px;
+            background-color: #2980b9;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input[type="text"], input[type="date"], input[type="tel"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="submit"], .toggle {
+            background-color: #1abc9c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .pacientes {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="agenda">
+        <h1>Agenda de Pacientes</h1>
+
+        <form id="formulario">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required><br>
+
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" required><br>
+
+            <label for="dpi">DPI:</label>
+            <input type="text" id="dpi" name="dpi" required><br>
+
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" required><br>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" required><br>
+
+            <input type="submit" value="Agendar">
+        </form>
+
+        <button class="toggle" onclick="togglePacientes()">Ver/Ocultar Pacientes Agendados</button>
+
+        <div class="pacientes" id="pacientes">
+            <h2>Pacientes Agendados:</h2>
+            <ul id="lista-pacientes">
+                <!-- Aquí se mostrarán los pacientes agendados -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pacientes = JSON.parse(localStorage.getItem('pacientes')) || [];
+            const listaPacientes = document.getElementById('lista-pacientes');
+
+            pacientes.forEach((paciente, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${paciente.nombre} ${paciente.apellido} - ${paciente.dpi} - ${paciente.fecha} - ${paciente.telefono}`;
+                
+                const btnDesagendar = document.createElement('button');
+                btnDesagendar.textContent = 'Desagendar';
+                btnDesagendar.addEventListener('click', function() {
+                    pacientes.splice(index, 1);
+                    localStorage.setItem('pacientes', JSON.stringify(pacientes));
+                    li.remove();
+                });
+                
+                li.appendChild(btnDesagendar);
+                listaPacientes.appendChild(li);
+            });
+
+            const formulario = document.getElementById('formulario');
+
+            formulario.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const nombre = document.getElementById('nombre').value;
+                const apellido = document.getElementById('apellido').value;
+                const dpi = document.getElementById('dpi').value;
+                const fecha = document.getElementById('fecha').value;
+                const telefono = document.getElementById('telefono').value;
+
+                const paciente = { nombre, apellido, dpi, fecha, telefono };
+                pacientes.push(paciente);
+
+                localStorage.setItem('pacientes', JSON.stringify(pacientes));
+
+                const li = document.createElement('li');
+                li.textContent = ` NOMBRE:| ${nombre} | APELLIDO: | ${apellido} | DPI: | ${dpi} | FECHA: | ${fecha} | TELEFONO: | ${telefono}`;
+
+                const btnDesagendar = document.createElement('button');
+                btnDesagendar.textContent = 'Desagendar';
+                btnDesagendar.addEventListener('click', function() {
+                    const index = pacientes.indexOf(paciente);
+                    pacientes.splice(index, 1);
+                    localStorage.setItem('pacientes', JSON.stringify(pacientes));
+                    li.remove();
+                });
+
+                li.appendChild(btnDesagendar);
+                listaPacientes.appendChild(li);
+
+                formulario.reset();
+            });
+        });
+
+        function togglePacientes() {
+            const pacientes = document.getElementById('pacientes');
+            pacientes.style.display = pacientes.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
